@@ -27,7 +27,7 @@ MIN_SIGNAL_SCORE   = float(os.environ.get("MIN_SIGNAL_SCORE", "6"))  # 6점 이�
 # 1. 바이낸스 캔들 데이터 수집
 # ─────────────────────────────────────────
 def fetch_candles(symbol: str, interval: str, limit: int = 100) -> pd.DataFrame:
-    url = "https://fapi.binance.com/fapi/v1/klines"
+    url = "https://api.binance.com/api/v3/klines"
     params = {"symbol": symbol, "interval": interval, "limit": limit}
     r = requests.get(url, params=params, timeout=10)
     r.raise_for_status()

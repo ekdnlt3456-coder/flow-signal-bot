@@ -1,6 +1,9 @@
 [build]
 builder = "NIXPACKS"
 
+[build.nixpacksPlan.phases.setup]
+nixPkgs = ["python311", "gcc", "libffi", "zlib", "freetype", "pkg-config"]
+
 [deploy]
 startCommand = "python main.py"
 restartPolicyType = "ON_FAILURE"

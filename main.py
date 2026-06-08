@@ -371,7 +371,7 @@ def main():
     print(f"  📊 결과: {direction} | 점수: {score}/10")
 
     # 신호 강도 필터
-    if direction == "WAIT" or score < MIN_SIGNAL_SCORE:
+    if score < MIN_SIGNAL_SCORE:
         print(f"  ⏸ 신호 미달 (direction={direction}, score={score}) → 발송 건너뜀")
         return
 

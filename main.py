@@ -27,18 +27,29 @@ MIN_SIGNAL_SCORE   = float(os.environ.get("MIN_SIGNAL_SCORE", "6"))  # 6점 이�
 # 1. 바이낸스 캔들 데이터 수집
 # ─────────────────────────────────────────
 def fetch_candles(symbol: str, interval: str, limit: int = 100) -> pd.DataFrame:
-    url = "https://api.binance.com/api/v3/klines"
-    params = {"symbol": symbol, "interval": interval, "limit": limit}
+    # Bybit API (지역 제한 없음)
+    interval_map = {"1h": "60", "4h": "240", "1d": "D"}
+    bybit_interval = interval_map.get(interval, "60")
+    
+    url = "https://api.bybit.com/v5/market/kline"
+    params = {
+        "category": "linear",
+        "symbol": symbol,
+        "interval": bybit_interval,
+        "limit": limit
+    }
     r = requests.get(url, params=params, timeout=10)
     r.raise_for_status()
-    data = r.json()
+    data = r.json()["result"]["list"]
+    
+    # Bybit는 최신순으로 내려줌 → 역순 정렬
+    data = list(reversed(data))
+    
     df = pd.DataFrame(data, columns=[
-        "open_time","open","high","low","close","volume",
-        "close_time","quote_vol","trades","taker_buy_base",
-        "taker_buy_quote","ignore"
+        "open_time", "open", "high", "low", "close", "volume", "turnover"
     ])
-    df["open_time"] = pd.to_datetime(df["open_time"], unit="ms", utc=True)
-    for col in ["open","high","low","close","volume"]:
+    df["open_time"] = pd.to_datetime(df["open_time"].astype(float), unit="ms", utc=True)
+    for col in ["open", "high", "low", "close", "volume"]:
         df[col] = df[col].astype(float)
     df.set_index("open_time", inplace=True)
     return df
